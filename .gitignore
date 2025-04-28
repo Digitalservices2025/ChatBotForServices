@@ -1,0 +1,56 @@
+# Ignore Visual Studio temporary files, build results, and
+# user-specific files
+.vs/
+*.user
+*.suo
+
+# Build results
+bin/
+obj/
+
+# NuGet packages
+*.nupkg
+packages/
+*.snupkg
+
+# Microsoft Azure Web App publish settings
+PublishProfiles/
+
+# User-specific files
+*.userprefs
+
+# Rider IDE files
+.idea/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# dotenv environment files
+.env
+.env.*
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# MacOS
+.DS_Store
+
+# Temporary files
+~$*
+*.tmp
+
+# Test results
+TestResults/
+
+# Configuration transforms
+appsettings.*.json
+appsettings.Development.json
+
+# Others
+*.swp

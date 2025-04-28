@@ -1,0 +1,66 @@
+var builder = WebApplication.CreateBuilder(args);
+
+// Register services
+builder.Services.AddRouting();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
+
+var app = builder.Build();
+
+// Serve static files (like index.html, CSS, JS)
+app.UseStaticFiles();
+
+// Route: Serve index.html by default
+app.MapGet("/", () => Results.Redirect("/index.html"));
+
+/// Route: Handle chat messages
+app.MapPost("/chat", async (HttpRequest request) =>
+{
+    var data = await request.ReadFromJsonAsync<ChatRequest>();
+    if (data?.Messages == null || !data.Messages.Any())
+        return Results.BadRequest(new { reply = "❌ Invalid message format." });
+
+    var userMessage = data.Messages.Last().Content;
+
+    // 1. Exact Match from FAQ
+    var faqMatch = ChattyFAQ.Data.FirstOrDefault(item =>
+        userMessage.Contains(item.Key, StringComparison.OrdinalIgnoreCase));
+
+    if (!string.IsNullOrEmpty(faqMatch.Key))
+        return Results.Json(new { reply = faqMatch.Value });
+
+    // 2. Suggestion Logic
+    var suggestions = ChattyFAQ.Data.Keys
+        .Where(key => key.Contains(userMessage, StringComparison.OrdinalIgnoreCase)
+                   || userMessage.Contains(key, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
+    if (suggestions.Any())
+    {
+        var suggested = suggestions.First();
+        return Results.Json(new
+        {
+            reply = $"คุณหมายถึง \"{suggested}\" หรือไม่?\nคำตอบ: {ChattyFAQ.Data[suggested]}"
+        });
+    }
+
+    // 3. Fallback to ChatGPT
+    var chatGptResponse = await OpenAIService.AskChatGPT(userMessage);
+    return Results.Json(new { reply = chatGptResponse });
+});
+
+/// Route: Handle file upload
+app.MapPost("/upload", async (IFormFile file) =>
+{
+    if (file == null || file.Length == 0)
+        return Results.BadRequest(new { message = "No file uploaded." });
+
+    return Results.Json(new
+    {
+        message = $"✅ Received file: {file.FileName}, size: {file.Length} bytes"
+    });
+});
+
+app.Run();

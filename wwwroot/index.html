@@ -1,24 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🤖 Chatty - Dark Mode</title>
 
     <!-- Import CSS -->
-    <link rel="stylesheet" href="/css/site.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/site.css?v=2" />
+  </head>
+  <body>
     <h2>🤖 Chatty</h2>
+
     <div id="chat-box"></div>
+
     <div id="controls">
-        <input type="text" id="user-input" placeholder="Type a message..." />
-        <button onclick="sendMessage()">Send</button>
-        <!-- <input type="file" id="fileInput">
-        <button onclick="uploadFile()">Upload File</button> -->
+      <input type="text" id="user-input" placeholder="Type a message..." />
+      <button id="send-button" onclick="sendMessage()">Send</button>
+
+      <a href="https://chat.openai.com/" target="_blank">
+        <button id="gpt-button" class="gpt-btn">GPT</button>
+      </a>
+    </div>
+
+    <!-- Modern File Upload Area -->
+    <div
+      id="drop-zone"
+      style="
+        background-color: #1e1e2f;
+        border: 2px dashed #4ea1ff;
+        padding: 25px;
+        margin-top: 20px;
+        text-align: center;
+        border-radius: 16px;
+        color: #d6eaff;
+        font-family: 'Segoe UI', sans-serif;
+        transition: border-color 0.3s ease;
+      "
+      ondragover="this.style.borderColor='#6bdcff'"
+      ondragleave="this.style.borderColor='#4ea1ff'"
+      ondrop="this.style.borderColor='#4ea1ff'"
+    >
+      <div style="font-size: 1.2rem; margin-bottom: 10px">
+        📥 <strong>Drag & Drop or Paste Screenshot</strong>
+      </div>
+
+      <input
+        type="file"
+        id="fileInput"
+        accept="image/*"
+        style="
+          display: block;
+          margin: 10px auto;
+          padding: 8px;
+          border-radius: 8px;
+          background-color: #2d2d44;
+          color: #d6eaff;
+          border: none;
+          font-size: 0.95rem;
+        "
+      />
+
+      <button
+        onclick="uploadSelectedFile()"
+        style="
+          margin-top: 10px;
+          padding: 10px 16px;
+          background-color: #4ea1ff;
+          color: #fff;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+        "
+        onmouseover="this.style.backgroundColor='#68b8ff'"
+        onmouseout="this.style.backgroundColor='#4ea1ff'"
+      >
+        ⬆ Upload File
+      </button>
+
+      <p id="file-name" style="margin-top: 10px; font-size: 0.9rem"></p>
     </div>
 
     <!-- Import JS -->
     <script src="/js/site.js"></script>
-</body>
+  </body>
 </html>

@@ -4,9 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🤖 Chatty - Dark Mode</title>
-
-    <!-- Import CSS -->
-    <link rel="stylesheet" href="css/site.css?v=2" />
+    <link rel="stylesheet" href="css/site.css" />
   </head>
   <body>
     <h2>🤖 Chatty</h2>
@@ -16,13 +14,27 @@
     <div id="controls">
       <input type="text" id="user-input" placeholder="Type a message..." />
       <button id="send-button" onclick="sendMessage()">Send</button>
-
       <a href="https://chat.openai.com/" target="_blank">
         <button id="gpt-button" class="gpt-btn">GPT</button>
       </a>
     </div>
 
-    <!-- Modern File Upload Area -->
+    <p
+      id="input-hint"
+      style="
+        text-align: center;
+        font-size: 0.85rem;
+        color: #9ca3af;
+        margin-top: -12px;
+        margin-bottom: 20px;
+      "
+    >
+      💡 คุณสามารถค้นหาไฟล์สำรองของคุณได้โดยพิมพ์:
+      <code>find file: คำค้นหา</code>
+    </p>
+
+    <div id="file-preview" style="margin: 10px 20px; color: #d6eaff"></div>
+
     <div
       id="drop-zone"
       style="
@@ -47,7 +59,6 @@
       <input
         type="file"
         id="fileInput"
-        accept="image/*"
         style="
           display: block;
           margin: 10px auto;
@@ -59,30 +70,8 @@
           font-size: 0.95rem;
         "
       />
-
-      <button
-        onclick="uploadSelectedFile()"
-        style="
-          margin-top: 10px;
-          padding: 10px 16px;
-          background-color: #4ea1ff;
-          color: #fff;
-          border: none;
-          border-radius: 8px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: background-color 0.3s ease;
-        "
-        onmouseover="this.style.backgroundColor='#68b8ff'"
-        onmouseout="this.style.backgroundColor='#4ea1ff'"
-      >
-        ⬆ Upload File
-      </button>
-
-      <p id="file-name" style="margin-top: 10px; font-size: 0.9rem"></p>
     </div>
 
-    <!-- Import JS -->
     <script src="/js/site.js"></script>
   </body>
 </html>

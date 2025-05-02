@@ -7,7 +7,6 @@ public static class OpenAIService
 {
     static OpenAIService() => Env.Load();
 
-    // Store chat history for the session
     private static readonly List<ChatMessage> chatHistory = new List<ChatMessage>
     {
         new ChatMessage(ChatRole.System, "You are a helpful assistant.")

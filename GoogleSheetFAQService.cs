@@ -8,8 +8,9 @@ namespace ChatBotForServices.Data;
 
 public static class GoogleSheetFAQService
 {
-    private static readonly string SheetId = "1PI38alcbujHwzUFTlfCMVyxm_mBaJkQCFfz1uya_v2k";
-    private static readonly string Range = "Data!A:B";
+    private static readonly string SheetId = Environment.GetEnvironmentVariable("GOOGLE_SHEET_ID");
+    private static readonly string Range = Environment.GetEnvironmentVariable("GOOGLE_SHEET_RANGE");
+
 
     private static Dictionary<string, string>? _faqCache;
 
@@ -32,8 +33,18 @@ public static class GoogleSheetFAQService
     {
         if (_faqCache != null) return _faqCache;
 
-        var credential = GoogleCredential.FromFile("D:/Work/ChatBotForServices/google-credentials.json")
+        var base64 = Environment.GetEnvironmentVariable("GOOGLE_CREDENTIAL_JSON_BASE64");
+
+        if (string.IsNullOrWhiteSpace(base64))
+            throw new InvalidOperationException("Missing GOOGLE_CREDENTIAL_JSON_BASE64 environment variable");
+
+        var jsonBytes = Convert.FromBase64String(base64);
+        using var stream = new MemoryStream(jsonBytes);
+
+        var credential = GoogleCredential
+            .FromStream(stream)
             .CreateScoped(SheetsService.Scope.SpreadsheetsReadonly);
+
 
         var service = new SheetsService(new BaseClientService.Initializer
         {

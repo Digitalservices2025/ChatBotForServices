@@ -48,7 +48,8 @@ public static class S3Service
                 return $"❌ No matching files found in S3 for '{keyword}'.";
 
             var sb = new StringBuilder();
-            sb.AppendLine($"✅ Found {matches.Count} matching file(s):");
+            sb.AppendLine("<div style='font-family:Segoe UI, sans-serif;'>");
+            sb.AppendLine($"✅ Found {matches.Count} matching file(s):<br/><br/>");
 
             foreach (var match in matches)
             {
@@ -60,13 +61,19 @@ public static class S3Service
                 };
 
                 var url = s3Client.GetPreSignedURL(urlRequest);
+                var fileName = Path.GetFileName(match.Key);
 
-                sb.AppendLine($"📄 {match.Key}");
-                sb.AppendLine($"🔗 {url}");
-                sb.AppendLine();
+                sb.AppendLine($@"
+<div style='margin-bottom: 14px; border: 1px solid #444; padding: 12px; border-radius: 8px; background-color: #2d2d44;'>
+  📄 <strong style='color:#fff;'>{fileName}</strong><br/>
+  <a href='{url}' target='_blank' style='color:#4ea1ff;text-decoration:underline;'>📥 Download</a>
+</div>");
+
             }
 
+            sb.AppendLine("</div>");
             return sb.ToString();
+
         }
         catch (AmazonS3Exception ex)
         {

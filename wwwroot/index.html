@@ -3,75 +3,542 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>🤖 Chatty - Dark Mode</title>
+    <title>🤖 Chatty - Ask TOR</title>
     <link rel="stylesheet" href="css/site.css" />
+    <style>
+      body {
+        font-family: "Segoe UI", sans-serif;
+        background-color: #1f1f2e;
+        color: #d6eaff;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      h2 {
+        margin-top: 20px;
+      }
+
+      #chat-box {
+        width: 90%;
+        max-width: 800px;
+        height: 60vh;
+        background-color: #2c2c3e;
+        border-radius: 10px;
+        overflow-y: auto;
+        padding: 16px;
+        margin: 20px 0;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .user-message,
+      .bot-message {
+        margin-bottom: 12px;
+        padding: 10px;
+        border-radius: 8px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .bot-message {
+        background-color: #3b3b55;
+        border-left: 4px solid #4ea1ff;
+      }
+
+      .user-message {
+        background-color: #4e5d94;
+        border-right: 4px solid #6bdcff;
+      }
+
+      .user-message {
+        background-color: #4e5d94;
+        align-self: flex-end;
+        text-align: right;
+      }
+
+      .bot-message {
+        background-color: #3b3b55;
+        align-self: flex-start;
+      }
+
+      .typing {
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0.3;
+        }
+      }
+
+      #controls {
+        display: flex;
+        width: 90%;
+        max-width: 800px;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      #user-input {
+        flex: 1;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        background-color: #2d2d44;
+        color: #fff;
+      }
+
+      #send-button {
+        padding: 10px 20px;
+        background-color: #4ea1ff;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      #send-button:hover {
+        background-color: #6bdcff;
+      }
+
+      @media (max-width: 600px) {
+        #controls {
+          flex-direction: column;
+        }
+
+        #send-button {
+          width: 100%;
+        }
+      }
+      #top-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        position: relative;
+        padding: 20px 0;
+      }
+
+      #logo {
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        width: 60px;
+        height: auto;
+      }
+
+      #title-block {
+        margin-top: auto;
+        padding-top: auto;
+      }
+
+      #top-header {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 10px 0;
+        position: relative;
+      }
+
+      #tkc-logo {
+        position: absolute;
+        left: 20px;
+        top: 20px;
+        width: 60px;
+        height: auto;
+      }
+
+      #main-logo {
+        width: 200px;
+        height: auto;
+        margin-top: auto;
+      }
+
+      .title-line {
+        display: block;
+      }
+
+      #dark-toggle-wrapper {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        transform: scale(0.25); /* Shrinks toggle size */
+        transform-origin: top right; /* Ensures correct scaling alignment */
+      }
+
+      #dark-toggle-wrapper input {
+        width: 0;
+        height: 0;
+        visibility: hidden;
+      }
+
+      #dark-toggle-wrapper label {
+        width: 500px;
+        height: 200px;
+        position: relative;
+        display: block;
+        background: #ebebeb;
+        border-radius: 200px;
+        box-shadow: inset 0px 5px 15px rgba(0, 0, 0, 0.4),
+          inset 0px -5px 15px rgba(255, 255, 255, 0.4);
+        cursor: pointer;
+        transition: 0.3s;
+      }
+
+      #dark-toggle-wrapper label:after {
+        content: "";
+        width: 180px;
+        height: 180px;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: linear-gradient(180deg, #ffcc89, #d8860b);
+        border-radius: 180px;
+        box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+        transition: 0.3s;
+      }
+
+      #dark-toggle-wrapper svg {
+        position: absolute;
+        width: 120px;
+        top: 40px;
+        z-index: 100;
+      }
+
+      #dark-toggle-wrapper svg.sun {
+        left: 40px;
+        fill: #fff;
+        transition: 0.3s;
+      }
+
+      #dark-toggle-wrapper svg.moon {
+        left: 340px;
+        fill: #7e7e7e;
+        transition: 0.3s;
+      }
+
+      #dark-toggle-wrapper input:checked + label {
+        background: #242424;
+      }
+
+      #dark-toggle-wrapper input:checked + label:after {
+        left: 490px;
+        transform: translateX(-100%);
+        background: linear-gradient(180deg, #777, #3a3a3a);
+      }
+
+      #dark-toggle-wrapper input:checked + label svg.sun {
+        fill: #7e7e7e;
+      }
+
+      #dark-toggle-wrapper input:checked + label svg.moon {
+        fill: #fff;
+      }
+
+      body.light-mode {
+        background-color: #ffffff;
+        color: #1f1f2e;
+      }
+
+      body.dark-mode {
+        background-color: #1f1f2e;
+        color: #d6eaff;
+      }
+
+      #chat-box.light-mode {
+        background-color: #e0e0e0;
+        color: #1f1f2e;
+      }
+
+      #chat-box.dark-mode {
+        background-color: #2c2c3e;
+        color: #d6eaff;
+      }
+
+      #user-input.light-mode {
+        background-color: #f0f0f0;
+        color: #000;
+      }
+
+      #user-input.dark-mode {
+        background-color: #2d2d44;
+        color: #fff;
+      }
+
+      .faq-response {
+        background-color: #2d2d44;
+        color: #d6eaff;
+        padding: 16px;
+        border-radius: 10px;
+        font-family: "Segoe UI", monospace;
+        white-space: pre-wrap;
+        overflow-x: auto;
+        border-left: 4px solid #4ea1ff;
+      }
+
+      .faq-response pre {
+        margin: 0;
+      }
+
+      .faq-table {
+        width: 100%;
+        background-color: #2d2d44;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+
+      .faq-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #444;
+        color: #d6eaff;
+      }
+
+      .faq-table {
+        width: 100%;
+        background-color: #2d2d44;
+        border-collapse: collapse;
+        border-radius: 8px;
+        overflow: hidden;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      .faq-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #444;
+        color: #d6eaff;
+        white-space: pre-wrap;
+      }
+
+      #layout {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+      }
+
+      #sidebar {
+        width: 280px;
+        background-color: #232332;
+        padding: 20px;
+        overflow-y: auto;
+        border-right: 2px solid #333;
+        font-size: 14px;
+        color: #d6eaff;
+      }
+
+      #sidebar h2 {
+        color: #4ea1ff;
+        margin-top: 0;
+      }
+
+      #sidebar code {
+        background-color: #1f1f2e;
+        padding: 2px 6px;
+        border-radius: 6px;
+        color: #4ea1ff;
+      }
+
+      #chat-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+      }
+    </style>
   </head>
   <body>
-    <h2>🤖 Chatty</h2>
+  <div id="layout">
+    <!-- 📘 Left Panel: Sidebar -->
+    <aside id="sidebar">
+      <h2>📘 โปรแกรมช่วยตอบคำถาม</h2>
 
-    <div id="chat-box"></div>
+      <h3>🔧 ความสามารถของระบบ</h3>
+      <ul>
+        <li>เข้าถึงไฟล์ทุกโครงการของ Digital Services (PDF, Doc, xlsx, pptx, PNG, JPG)</li>
+        <li>ช่วยทีม Help Desk O&amp;M เตรียมข้อมูลตอบลูกค้า</li>
+        <li>ถาม-ตอบอัจฉริยะด้วย GPT Module</li>
+      </ul>
 
-    <div id="controls">
-      <input type="text" id="user-input" placeholder="Type a message..." />
-      <button id="send-button" onclick="sendMessage()">Send</button>
-      <a href="https://chat.openai.com/" target="_blank">
-        <button id="gpt-button" class="gpt-btn">GPT</button>
-      </a>
-    </div>
+      <h3>📌 โครงการที่รองรับ</h3>
+      <ul>
+        <li><strong>DP</strong> – Digital Platform</li>
+        <li><strong>AOT</strong> – Airports of Thailand</li>
+        <li><strong>MEGA</strong> – ระบบ Wi-Fi เมกาบางนา</li>
+        <li><strong>GDCC</strong> – On-Call MA ระบบ DTRS & DPTS</li>
+      </ul>
 
-    <p
-      id="input-hint"
-      style="
-        text-align: center;
-        font-size: 0.85rem;
-        color: #9ca3af;
-        margin-top: -12px;
-        margin-bottom: 20px;
-      "
-    >
-      💡 คุณสามารถค้นหาไฟล์สำรองของคุณได้โดยพิมพ์:
-      <code>find file: คำค้นหา</code>
-    </p>
+      <h3>🧪 ตัวอย่างการใช้งาน</h3>
+      <ul>
+        <li><code>DP มือถือหาย</code></li>
+        <li><code>DP ไม่ได้รับรหัส OTP</code></li>
+        <li><code>MEGA power supply เสีย</code></li>
+        <li><code>GDCC เมมบอร์ดพัง</code></li>
+      </ul>
 
-    <div id="file-preview" style="margin: 10px 20px; color: #d6eaff"></div>
+      <h3>🔍 วิธีค้นหาไฟล์</h3>
+      <ul>
+        <li><code>Find File: คู่มือเจ้าหน้าศูนย์ดิจิตอลชุมชน</code></li>
+        <li><code>Find File: Flow เคลมมือถือ</code></li>
+      </ul>
+    </aside>
 
-    <div
-      id="drop-zone"
-      style="
-        background-color: #1e1e2f;
-        border: 2px dashed #4ea1ff;
-        padding: 25px;
-        margin-top: 20px;
-        text-align: center;
-        border-radius: 16px;
-        color: #d6eaff;
-        font-family: 'Segoe UI', sans-serif;
-        transition: border-color 0.3s ease;
-      "
-      ondragover="this.style.borderColor='#6bdcff'"
-      ondragleave="this.style.borderColor='#4ea1ff'"
-      ondrop="this.style.borderColor='#4ea1ff'"
-    >
-      <div style="font-size: 1.2rem; margin-bottom: 10px">
-        📥 <strong>Drag & Drop or Paste Screenshot</strong>
+    <!-- 🤖 Right Panel: Chat -->
+    <main id="chat-panel">
+      <header id="top-header">
+        <img src="images/TKC_logo_tranparent.png" alt="TKC Logo" id="tkc-logo" />
+        <div id="title-block">
+          <img src="images/Logo.png" alt="DIGITAL SERVICES Logo" id="main-logo" />
+        </div>
+        <div id="dark-toggle-wrapper">
+          <input type="checkbox" id="darkmode-toggle" />
+          <label for="darkmode-toggle">
+            <!-- SUN and MOON SVG remain -->
+          </label>
+        </div>
+      </header>
+
+      <div id="chat-box"></div>
+
+      <div id="controls">
+        <input type="text" id="user-input" placeholder="find file: ชื่อไฟล์.." />
+        <button id="send-button" onclick="sendMessage()">Send</button>
       </div>
+    </main>
+  </div>
+</body>
 
-      <input
-        type="file"
-        id="fileInput"
-        style="
-          display: block;
-          margin: 10px auto;
-          padding: 8px;
-          border-radius: 8px;
-          background-color: #2d2d44;
-          color: #d6eaff;
-          border: none;
-          font-size: 0.95rem;
-        "
-      />
-    </div>
 
-    <script src="/js/site.js"></script>
+    <script>
+      const input = document.getElementById("user-input");
+
+      input.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") sendMessage();
+      });
+
+      async function sendMessage() {
+        const message = input.value.trim();
+        if (!message) return;
+
+        appendMessage("user", message);
+        input.value = "";
+        appendMessage("bot", "⏳ Thinking...");
+
+        try {
+          const response = await fetch("/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+              messages: [{role: "user", content: message}],
+            }),
+          });
+
+          const data = await response.json();
+          updateLastBotMessage(data.reply || "⚠️ No response.");
+        } catch (error) {
+          updateLastBotMessage("❌ Error contacting the server.");
+        }
+      }
+
+      function isMediaLink(content) {
+        return (
+          typeof content === "string" &&
+          (content.endsWith(".png") ||
+            content.endsWith(".jpg") ||
+            content.endsWith(".jpeg") ||
+            content.endsWith(".gif") ||
+            content.endsWith(".pdf"))
+        );
+      }
+
+      function createMediaElement(url) {
+        const ext = url.split(".").pop().toLowerCase();
+        if (ext === "pdf") {
+          const iframe = document.createElement("iframe");
+          iframe.src = url;
+          iframe.width = "100%";
+          iframe.height = "400px";
+          iframe.style.border = "none";
+          return iframe;
+        } else {
+          const img = document.createElement("img");
+          img.src = url;
+          img.alt = "Preview";
+          img.style.maxWidth = "100%";
+          img.style.borderRadius = "8px";
+          return img;
+        }
+      }
+
+      function appendMessage(role, content) {
+        const chatBox = document.getElementById("chat-box");
+        const msg = document.createElement("div");
+        msg.className = role === "user" ? "user-message" : "bot-message";
+
+        if (role === "bot") {
+          msg.innerHTML = content;
+        } else {
+          msg.innerText = content;
+        }
+
+        chatBox.appendChild(msg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      function updateLastBotMessage(newContent) {
+        const chatBox = document.getElementById("chat-box");
+        const messages = chatBox.getElementsByClassName("bot-message");
+        if (messages.length > 0) {
+          messages[messages.length - 1].innerHTML = newContent;
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      }
+
+      const toggle = document.getElementById("darkmode-toggle");
+      const body = document.body;
+      const chatBox = document.getElementById("chat-box");
+      const userInput = document.getElementById("user-input");
+
+      // Load saved mode
+      const savedMode = localStorage.getItem("theme");
+      if (savedMode === "light") {
+        toggle.checked = false;
+        applyTheme("light");
+      } else {
+        toggle.checked = true;
+        applyTheme("dark");
+      }
+
+      toggle.addEventListener("change", () => {
+        if (toggle.checked) {
+          applyTheme("dark");
+          localStorage.setItem("theme", "dark");
+        } else {
+          applyTheme("light");
+          localStorage.setItem("theme", "light");
+        }
+      });
+
+      function applyTheme(mode) {
+        body.classList.remove("light-mode", "dark-mode");
+        chatBox.classList.remove("light-mode", "dark-mode");
+        userInput.classList.remove("light-mode", "dark-mode");
+
+        body.classList.add(`${mode}-mode`);
+        chatBox.classList.add(`${mode}-mode`);
+        userInput.classList.add(`${mode}-mode`);
+      }
+    </script>
   </body>
 </html>

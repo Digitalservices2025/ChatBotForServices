@@ -35,7 +35,7 @@ app.UseStaticFiles();
 // Route: Serve index.html by default
 app.MapGet("/", () => Results.Redirect("/index.html"));
 
-/// Route: Handle chat messages
+// Route: Handle chat messages
 app.MapPost("/chat", async (HttpRequest request) =>
 {
     var data = await request.ReadFromJsonAsync<ChatRequest>();
@@ -44,64 +44,73 @@ app.MapPost("/chat", async (HttpRequest request) =>
 
     var userMessage = data.Messages.Last().Content.Trim();
 
+    // Handle S3-based "find file"
     if (userMessage.StartsWith("find file:", StringComparison.OrdinalIgnoreCase))
     {
-        var keyword = userMessage.Replace("find file:", "").Trim();
-        var s3Response = await S3Service.SearchFilesAsync(keyword);
-        return Results.Json(new { reply = s3Response });
+        var keyword = userMessage["find file:".Length..].Trim();
+
+        var s3Result = await S3Service.SearchFilesAsync(keyword);
+        return Results.Json(new { reply = s3Result });
     }
 
-    var sheetMatch = await GoogleSheetFAQService.TryMatchAsync(userMessage);
-    if (!string.IsNullOrWhiteSpace(sheetMatch))
-        return Results.Json(new { reply = sheetMatch });
+    // First check if it's an FAQ match
+    var faqResponse = await GoogleSheetFAQService.TryMatchAsync(userMessage);
+    if (!string.IsNullOrEmpty(faqResponse))
+    {
+        return Results.Json(new { reply = faqResponse });
+    }
 
-    var chatGptResponse = await OpenAIService.AskChatGPT(userMessage);
-    return Results.Json(new { reply = chatGptResponse });
+    // Otherwise, fallback to GPT-4o
+    var response = await OpenAIService.CallOpenAIAsync(userMessage);
+    return Results.Json(new { reply = response });
+
 });
 
 
-app.MapPost("/upload-image", async (HttpRequest req) =>
-{
-    var file = req.Form.Files.FirstOrDefault();
-    if (file == null || file.Length == 0)
-        return Results.BadRequest(new { text = "❌ No image found." });
 
-    using var ms = new MemoryStream();
-    await file.CopyToAsync(ms);
-    ms.Position = 0;
 
-    using var img = Pix.LoadFromMemory(ms.ToArray());
-    using var engine = new TesseractEngine(@"./tessdata", "eng+tha", EngineMode.Default);
-    engine.SetVariable("user_defined_dpi", "300");
+// app.MapPost("/upload-image", async (HttpRequest req) =>
+// {
+//     var file = req.Form.Files.FirstOrDefault();
+//     if (file == null || file.Length == 0)
+//         return Results.BadRequest(new { text = "❌ No image found." });
 
-    using var page = engine.Process(img);
-    string extractedText = page.GetText();
+//     using var ms = new MemoryStream();
+//     await file.CopyToAsync(ms);
+//     ms.Position = 0;
 
-    var autoPrompt = $"I found this problem in a file:\n\n{extractedText}\n\nPlease suggest how to fix this.";
-    var fixSuggestion = await OpenAIService.AskChatGPT(autoPrompt);
+//     using var img = Pix.LoadFromMemory(ms.ToArray());
+//     using var engine = new TesseractEngine(@"./tessdata", "eng+tha", EngineMode.Default);
+//     engine.SetVariable("user_defined_dpi", "300");
 
-    return Results.Json(new { text = $"📸 OCR Result:\n{extractedText}\n\n🛠️ Chatty Suggests:\n{fixSuggestion}" });
-});
+//     using var page = engine.Process(img);
+//     string extractedText = page.GetText();
 
-app.MapPost("/upload-read", async (HttpRequest req) =>
-{
-    var file = req.Form.Files.FirstOrDefault();
-    if (file == null || file.Length == 0)
-        return Results.BadRequest(new { summary = "❌ No file found." });
+//     var autoPrompt = $"I found this problem in a file:\n\n{extractedText}\n\nPlease suggest how to fix this.";
+//     var fixSuggestion = await OpenAIService.CallOpenAIAsync(autoPrompt);
 
-    using var ms = new MemoryStream();
-    await file.CopyToAsync(ms);
-    var bytes = ms.ToArray();
+//     return Results.Json(new { text = $"📸 OCR Result:\n{extractedText}\n\n🛠️ Chatty Suggests:\n{fixSuggestion}" });
+// });
 
-    var extracted = FileReaderService.ExtractText(file.FileName, bytes);
-    if (extracted.StartsWith("[❌"))
-        return Results.Json(new { summary = extracted });
+// app.MapPost("/upload-read", async (HttpRequest req) =>
+// {
+//     var file = req.Form.Files.FirstOrDefault();
+//     if (file == null || file.Length == 0)
+//         return Results.BadRequest(new { summary = "❌ No file found." });
 
-    var prompt = $"Summarize or answer based on this content:\n\n{extracted[..Math.Min(4000, extracted.Length)]}";
-    var aiReply = await OpenAIService.AskChatGPT(prompt);
+//     using var ms = new MemoryStream();
+//     await file.CopyToAsync(ms);
+//     var bytes = ms.ToArray();
 
-    return Results.Json(new { summary = aiReply });
-});
+//     var extracted = FileReaderService.ExtractText(file.FileName, bytes);
+//     if (extracted.StartsWith("[❌"))
+//         return Results.Json(new { summary = extracted });
+
+//     var prompt = $"Summarize or answer based on this content:\n\n{extracted[..Math.Min(4000, extracted.Length)]}";
+//     var aiReply = await OpenAIService.CallOpenAIAsync(prompt);
+
+//     return Results.Json(new { summary = aiReply });
+// });
 
 
 app.Run();

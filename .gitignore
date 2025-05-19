@@ -54,3 +54,4 @@ appsettings.Development.json
 
 # Others
 *.swp
+google-credentials.json

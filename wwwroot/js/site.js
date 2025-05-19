@@ -63,12 +63,16 @@ async function sendMessage() {
   });
 
   const data = await response.json();
-  const formattedReply = linkify(data.reply);
 
-  // Replace the thinking message with Chatty's reply
+  const isHtml = data.reply.includes("<a ");
+  const formattedReply = isHtml ? data.reply : linkify(data.reply);
+
   const thinkingElement = document.getElementById(thinkingId);
   if (thinkingElement) {
-    thinkingElement.innerHTML = `<strong>Chatty:</strong> ${formattedReply}`;
+    const replyDiv = document.createElement("div");
+    replyDiv.className = "message Chatty";
+    replyDiv.innerHTML = `<strong>Chatty:</strong><br>${formattedReply}`;
+    thinkingElement.replaceWith(replyDiv);
   }
 
   messages.push({role: "user", content: userMessage});

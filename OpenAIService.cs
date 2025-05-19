@@ -12,7 +12,7 @@ public static class OpenAIService
         new ChatMessage(ChatRole.System, "You are a helpful assistant.")
     };
 
-    public static async Task<string> AskChatGPT(string userMessage)
+    public static async Task<string> CallOpenAIAsync(string prompt)
     {
         var apiKey = GetEnvVar("AZURE_OPENAI_KEY");
         var endpoint = GetEnvVar("AZURE_OPENAI_ENDPOINT");
@@ -20,31 +20,33 @@ public static class OpenAIService
 
         var client = new OpenAIClient(new Uri(endpoint), new AzureKeyCredential(apiKey));
 
-        // Add user's message to history
-        chatHistory.Add(new ChatMessage(ChatRole.User, userMessage));
-
         var chatOptions = new ChatCompletionsOptions
         {
-            DeploymentName = deployment
+            DeploymentName = deployment,
+            Messages =
+        {
+            new ChatMessage(ChatRole.System, "You are a helpful assistant. Answer using only the provided context."),
+            new ChatMessage(ChatRole.User, prompt)
+        }
         };
 
-        // Include the full conversation history
-        foreach (var message in chatHistory)
-        {
-            chatOptions.Messages.Add(message);
-        }
-
         var response = await client.GetChatCompletionsAsync(chatOptions);
-
-        var reply = response.Value.Choices[0].Message.Content.Trim();
-
-        // Add assistant's reply to history
-        chatHistory.Add(new ChatMessage(ChatRole.Assistant, reply));
-
-        return reply;
+        return response.Value.Choices[0].Message.Content.Trim();
     }
 
-    private static string GetEnvVar(string key)
+
+    public static async Task<string> AskQuestionWithContextAsync(string question, List<string> contextChunks)
+    {
+        string prompt = $"Answer this question using the context below:\n\nContext:\n";
+        foreach (var chunk in contextChunks)
+            prompt += $"- {chunk}\n";
+        prompt += $"\nQuestion: {question}";
+
+        return await CallOpenAIAsync(prompt);
+    }
+
+
+    public static string GetEnvVar(string key)
     {
         var value = Environment.GetEnvironmentVariable(key);
         if (string.IsNullOrWhiteSpace(value))
@@ -52,7 +54,6 @@ public static class OpenAIService
         return value;
     }
 
-    // Optional: Method to clear chat history if needed
     public static void ResetChatHistory()
     {
         chatHistory.Clear();

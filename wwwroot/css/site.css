@@ -1,136 +1,144 @@
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #343541;
-  color: #ececec;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-
-h2 {
-  margin: 20px 0;
-  color: #ffffff;
-}
-
 #chat-box {
-  width: 90%;
-  max-width: 800px;
-  height: 70vh;
-  background: #40414f;
-  border-radius: 8px;
-  padding: 20px;
+  height: 400px;
   overflow-y: auto;
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
+  background-color: #1e1e2f;
+  border: 1px solid #444;
+  padding: 15px;
+  border-radius: 10px;
+  margin: 20px;
+  color: #d6eaff;
+  font-family: monospace;
 }
 
-.message {
-  max-width: 75%;
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin: 8px 0;
-  line-height: 1.6;
-  word-wrap: break-word;
+.user-message {
+  text-align: right;
+  color: #90e0ef;
+  margin-bottom: 10px;
 }
 
-.user {
-  align-self: flex-end;
-  background-color: #2b2b2b;
-  color: #fff;
-  border-top-right-radius: 0;
-}
-
-.Chatty {
-  align-self: flex-start;
-  background-color: #4a5568;
-  color: #d1d5db;
-  border-top-left-radius: 0;
+.bot-message {
+  text-align: left;
+  color: #fefefe;
+  margin-bottom: 10px;
 }
 
 #controls {
-  width: 90%;
-  max-width: 800px;
   display: flex;
+  justify-content: center;
   gap: 10px;
-  margin: 20px 0;
-  align-items: center; 
+  margin: 20px;
 }
 
 #user-input {
   flex: 1;
-  padding: 12px;
-  border: 1px solid #555;
-  border-radius: 20px;
-  font-size: 16px;
-  background-color: #2d2d2d;
-  color: #fff;
-}
-
-button, 
-#gpt-button {
-  flex: 0 0 100px; 
-  height: 45px;    
-  border: none;
   padding: 10px;
   border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  font-size: 1rem;
+  border: none;
+  background-color: #2d2d44;
+  color: #d6eaff;
 }
-
 
 #send-button {
-  background-color: #262c4d;
-  color: #fff;
-  font-weight: bold;
-}
-#send-button:hover {
-  background-color: #1f1f3a;
-}
-
-#gpt-button {
-  background-color: #000;
-  color: #fff;
-  font-weight: bold;
-}
-#gpt-button:hover {
-  background-color: #333;
-}
-
-.send-btn {
+  padding: 10px 20px;
   background-color: #4ea1ff;
-  color: #fff;
-}
-.send-btn:hover {
-  background-color: #1f7fd3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
-.Chatty a {
-  color: #63b3ed;
+.bot-message p {
+  background-color: #2d2d44;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  line-height: 1.6;
+}
+
+.bot-message a {
+  color: #4ea1ff;
   text-decoration: underline;
 }
-.Chatty a:hover {
-  color: #4299e1;
+
+/* Bot messages already styled */
+.s3-file-card {
+  background-color: #2a2a40;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 10px 0;
+  line-height: 1.6;
+  word-break: break-word;
 }
 
-.message img {
-  max-width: 100%;
+.s3-file-card strong {
+  color: #d6eaff;
+}
+
+.s3-link {
+  color: #4ea1ff;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.file-card {
+  background-color: #2a2a40;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  font-family: "Segoe UI", sans-serif;
+  line-height: 1.6;
+  color: #d6eaff;
+  display: flex;
+  flex-direction: column;
+}
+
+.file-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 6px;
+  word-break: break-word;
+}
+
+.file-download {
+  font-weight: bold;
+  color: #4ea1ff;
+  text-decoration: none;
+  background: #1e1e2f;
+  padding: 6px 10px;
   border-radius: 6px;
-  margin-top: 5px;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.1);
+  width: fit-content;
+  transition: background 0.2s;
 }
 
-#file-links li {
-  padding: 6px 0;
-  list-style: none;
+.file-download:hover {
+  background-color: #3a3a5e;
 }
 
-#file-links li a:hover {
+.message {
+  word-break: break-word;
+  white-space: normal;
+}
+
+.message a {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+
+.message.Chatty {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.message.Chatty a {
+  color: #4ea1ff;
   text-decoration: underline;
-  color: #3182ce;
+  word-break: break-word;
+}
+
+
+#chat-box {
+  word-break: break-word;
 }
